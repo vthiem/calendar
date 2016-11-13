@@ -1,0 +1,74 @@
+table {
+  font-family: Tahoma, Arial;
+  background-color: #90C1D4;
+  border-radius: 10px;
+  padding: 5px;
+  color: red; /*TESTING*/
+}
+
+.month, .weekview, .dailyview {
+  font-size: 26px;
+  color: white;
+  background-color: #90c3d4;
+  height: 45px;
+}
+
+.weekdays {
+  font-size: 20px;
+  color: white;
+  background-color: #90a9d4;
+  text-align: center;
+}
+
+.weekdays td {
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.days {
+  font-size: 18px;
+  color: #909CD4;
+}
+
+.days td {
+  background-color: white;
+  padding-bottom: 20px;
+  padding-right: 20px;
+  border-radius: 3px;
+  height: 50px;
+  width: 50px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.timeslots {
+  background-color: white;
+  color: #90a9d4;
+
+}
+
+.hours {
+  font-size: 14px;
+  color: #90a9d4;
+  background-color: white;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.weeklyevents {
+  background-color: white;
+}
+
+.weeklyevents td {
+  border-radius: 3px;
+}
+
+.dailyevents {
+  background-color: white;
+}
+
+.dailyevents td {
+  border-radius: 3px;
+}
