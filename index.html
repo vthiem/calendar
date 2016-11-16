@@ -4,79 +4,142 @@
 <head>
   <title>Portal Calendar</title>
   <link rel="stylesheet" href="style.css"></link>
+  <script type="text/javascript" src="calendar.js"></script>
 </head>
 
 <body>
+
+  <!--EDIT POPUP-->
+  <div id="editpopup">
+    <h1>Edit Event</h1>
+    <form> <!--action="info.php"-->
+      <p>Event Title: <input type="text" name="eventName"></p>
+      <p>Start: <input type="time" name="eventStartTime">   End: <input type="time" name="eventEndTime"></p>
+      <p>Date: <input type="date" name="eventDate"></p>
+      <p>Details: <input type="text" name="eventDetails"></p>
+      <p>Repeat: <input type="radio" name="eventRepeat"></p>
+      <p>None: <input type="radio" name="repeat" value="none" checked>   Weekly: <input type="radio" name="repeat" value="weekly">   Monthly: <input type="radio" name="repeat" value="monthly"></p>
+      <p><input type="radio" name="weeklySun" value="Sun">Sun <input type="radio" name="weeklyMon" value="Mon">Mon <input type="radio" name="weeklyTue" value="Tue">Tue <input type="radio" name="weeklyWed" value="Wed">Wed <input type="radio" name="weeklyThu" value="Thu">Thu <input type="radio" name="weeklyFri" value="Fri">Fri <input type="radio" name="weeklySat" value="Sat">Sat</p>
+      <p><input type="submit"></p>
+    </form>
+    <button id="exitEdit" onclick="cancelEdit()">x</button>
+  </div>
+
+
+<!--Right Drawer-->
+  <div id="rightdrawer">
+    <dl>
+      <dt class="date" id="drawerHeader">Mon, Nov 14th 2016</dt>
+        <dd class="datetime">Event Time</dd>
+        <dd class="datetitle">Event Title</dd>
+        <dd class="datetime">Event2 Time</dd>
+        <dd class="datetitle">Event2 Title</dd>
+        <dd class="datetime">Event3 Time</dd>
+        <dd class="datetitle">Event3 Title</dd>
+    </dl>
+  </div>
+
 <!--MONTHLY VIEW-->
-  <table>
-    <tr class="month">
-      <th colspan="7">Month</th>
-    </tr>
-    <tr class="weekdays">
-      <td>Sun</td>
-      <td>Mon</td>
-      <td>Tues</td>
-      <td>Wed</td>
-      <td>Thu</td>
-      <td>Fri</td>
-      <td>Sat</td>
-    </tr>
-    <tr class = "days">
-      <td></td>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-      <td>4</td>
-      <td>5</td>
-      <td>6</td>
-    </tr>
-    <tr class = "days">
-      <td>7</td>
-      <td>8</td>
-      <td>9</td>
-      <td>10</td>
-      <td>11</td>
-      <td>12</td>
-      <td>13</td>
-    </tr>
-    <tr class="days">
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-    </tr>
-    <tr class="days">
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-    </tr>
-    <tr class="days">
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-    </tr>
-  </table>
+  <div id="weeklyPanel">
+    <table id="weeklyPanelClick">
+      <tr>
+        <td>Week 1</td>
+      </tr>
+      <tr>
+        <td>Week 2</td>
+      </tr>
+      <tr>
+        <td>Week 3</td>
+      </tr>
+      <tr>
+        <td>Week 4</td>
+      </tr>
+      <tr>
+        <td>Week 5</td>
+      </tr>
+    </table>
+  </div>
+  <div id="monthlyview">
+    <div id=prevMonth>
+      <button onclick="getPrevMonth()"><</button>
+    </div>
+
+    <div id=nextMonth>
+      <button onclick="getNextMonth()">></button>
+    </div>
+
+    <table class="view" id="monthDayClick">
+      <tr class="month">
+        <th colspan="7" id="monthHeader"> </th>
+      </tr>
+      <tr class="weekdays">
+        <td>Sun</td>
+        <td>Mon</td>
+        <td>Tues</td>
+        <td>Wed</td>
+        <td>Thu</td>
+        <td>Fri</td>
+        <td>Sat</td>
+      </tr>
+      <tr class = "days">
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+      </tr>
+      <tr class = "days">
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+      </tr>
+      <tr class="days">
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+      </tr>
+      <tr class="days">
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+      </tr>
+      <tr class="days">
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+      </tr>
+    </table>
+  </div>
+  <div id="addEvent">
+    <button onclick="editpopup()">+</button>
+  </div>
 
 <!--WEEKLY VIEW-->
-</br>
-
-  <table>
+  <div id="weeklyview">
+  <table class="view" id="weekTimeClick">
     <tr class="weekview">
       <th colspan="8">Week</th>
     </tr>
     <tr class="weekdays">
-      <td class="timeslots">Time</td>
+      <td id="weekcellone"> </td>
       <td>Sunday</td>
       <td>Monday</td>
       <td>Tuesday</td>
@@ -84,6 +147,16 @@
       <td>Thursday</td>
       <td>Friday</td>
       <td>Saturday</td>
+    </tr>
+    <tr id="weeklydates">
+      <td class="timeslots">Time</td>
+      <td> 2</td>
+      <td> 3</td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">12:00 AM</td>
@@ -156,10 +229,10 @@
       <td> </td>
     </tr>
   </table>
+</div>
 
-<!--DAILY VIEW-->
-</br>
-  <table>
+<div id="dailyview">
+  <table class="view">
     <tr>
       <th colspan="2" class="dailyview">Daily</th>
     </tr>
@@ -196,6 +269,6 @@
       <td> </td>
     </tr>
   </table>
+</div>
 </body>
-
 </html>
