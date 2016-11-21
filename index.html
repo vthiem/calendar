@@ -12,15 +12,15 @@
   <!--EDIT POPUP-->
   <div id="editpopup">
     <h1>Edit Event</h1>
-    <form> <!--action="info.php"-->
+    <form id="eventInputs"> <!--action="info.php"-->
       <p>Event Title: <input type="text" name="eventName"></p>
       <p>Start: <input type="time" name="eventStartTime">   End: <input type="time" name="eventEndTime"></p>
       <p>Date: <input type="date" name="eventDate"></p>
       <p>Details: <input type="text" name="eventDetails"></p>
-      <p>Repeat: <input type="radio" name="eventRepeat"></p>
-      <p>None: <input type="radio" name="repeat" value="none" checked>   Weekly: <input type="radio" name="repeat" value="weekly">   Monthly: <input type="radio" name="repeat" value="monthly"></p>
-      <p><input type="radio" name="weeklySun" value="Sun">Sun <input type="radio" name="weeklyMon" value="Mon">Mon <input type="radio" name="weeklyTue" value="Tue">Tue <input type="radio" name="weeklyWed" value="Wed">Wed <input type="radio" name="weeklyThu" value="Thu">Thu <input type="radio" name="weeklyFri" value="Fri">Fri <input type="radio" name="weeklySat" value="Sat">Sat</p>
-      <p><input type="submit"></p>
+      <p>Repeat: <input type="checkbox" name="eventRepeat" id="repeatOptionButton" onclick="repeatOption()"></p>
+      <p>None: <input type="radio" name="repeat" value="none" checked disabled="true" id="repNone" onclick="resetWeekly()">   Weekly: <input type="radio" name="repeat" value="weekly" disabled="true" id="repWeekly" onclick="repWeeklyOptions()">   Monthly: <input type="radio" name="repeat" value="monthly" disabled="true" id="repMonthly" onclick="resetWeekly()"></p>
+      <p><input type="checkbox" name="weeklySun" value="Sun" disabled="true" id="Sun">Sun <input type="checkbox" name="weeklyMon" value="Mon" disabled="true" id="Mon">Mon <input type="checkbox" name="weeklyTue" value="Tue" disabled="true" id="Tue">Tue <input type="checkbox" name="weeklyWed" value="Wed" disabled="true" id="Wed">Wed <input type="checkbox" name="weeklyThu" value="Thu" disabled="true" id="Thu">Thu <input type="checkbox" name="weeklyFri" value="Fri" disabled="true" id="Fri">Fri <input type="checkbox" name="weeklySat" value="Sat" disabled="true" id="Sat">Sat</p>
+      <p><input type="button" value="Submit" onclick="formHandling()"></p>
     </form>
     <button id="exitEdit" onclick="cancelEdit()">x</button>
   </div>
@@ -30,12 +30,12 @@
   <div id="rightdrawer">
     <dl>
       <dt class="date" id="drawerHeader">Mon, Nov 14th 2016</dt>
-        <dd class="datetime">Event Time</dd>
+        <!-- <dd class="datetime">Event Time</dd>
         <dd class="datetitle">Event Title</dd>
         <dd class="datetime">Event2 Time</dd>
         <dd class="datetitle">Event2 Title</dd>
         <dd class="datetime">Event3 Time</dd>
-        <dd class="datetitle">Event3 Title</dd>
+        <dd class="datetitle">Event3 Title</dd> -->
     </dl>
   </div>
 
@@ -150,8 +150,8 @@
     </tr>
     <tr id="weeklydates">
       <td class="timeslots">Time</td>
-      <td> 2</td>
-      <td> 3</td>
+      <td> </td>
+      <td> </td>
       <td> </td>
       <td> </td>
       <td> </td>

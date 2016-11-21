@@ -12,6 +12,7 @@
 }
 
 #weeklydates{
+  color: white;
   background-color: #90a9d4;
   text-align: center;
 }
@@ -195,6 +196,8 @@
   position: absolute;
   top: 0;
   bottom: 0;
+  width: 100%;
+  height: 100%;
   display: none;
 }
 
