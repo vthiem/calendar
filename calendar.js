@@ -24,7 +24,9 @@ function Event(n, s, e, d, det, rep, repDays){
 
 function checkDate(celldate){
   if(dateEvents.hasOwnProperty(celldate)){
-    return true;
+    if(dateEvents[celldate].length>0){
+      return true;
+    }
   }
   return false;
 }
@@ -86,6 +88,10 @@ function repWeeklyOptions(){
   }
 }
 
+function sortEvents(eventList){
+
+}
+
 function formHandling(){
   var formData = new FormData(document.querySelector("#eventInputs"));
   cancelEdit();
@@ -109,23 +115,28 @@ function formHandling(){
 }
 
 function editpopup(){
+  var edit = document.querySelector("#editpopup");
   if(document.getElementById("rightdrawer").style.zIndex === "3"){
     document.getElementById("rightdrawer").style.filter = "blur(1px)";
-    document.getElementById("editpopup").style.zIndex = "4";
+    edit.style.zIndex = "4";
   }
   else{
-    document.getElementById("editpopup").style.zIndex="2";
+    edit.style.zIndex="2";
   }
   document.getElementById("weeklyPanel").style.filter = "blur(1px)";
   document.getElementById("monthlyview").style.filter = "blur(1px)";
   document.getElementById("addEvent").style.zIndex = "0";
+  edit.style.display = "inline";
 }
 
 function cancelEdit(){
-  if(document.getElementById("rightdrawer").style.zIndex === "3"){
-    document.getElementById("rightdrawer").style.filter = "none";
+  var edit = document.querySelector("#editpopup");
+  var sidepanel = document.querySelector("#rightdrawer");
+  if(sidepanel.style.zIndex === "3"){
+    sidepanel.style.filter = "none";
   }
-  document.getElementById("editpopup").style.zIndex="0";
+  edit.style.zIndex="0";
+  edit.style.display = "none";
   document.getElementById("weeklyPanel").style.filter = "none";
   document.getElementById("monthlyview").style.filter = "none";
   document.getElementById("addEvent").style.zIndex = "10";
@@ -176,15 +187,15 @@ function setupCalendar(yr, mth){
   if(tbl != null){
     for(var i=2; i<tbl.rows.length; i++){
       for(var j=0; j<tbl.rows[i].cells.length; j++){
-        tbl.rows[i].cells[j].innerHTML = " ";
-        tbl.rows[i].cells[j].style.color = "#909CD4";
-        tbl.rows[i].cells[j].style.fontWeight = "normal";
-        tbl.rows[i].cells[j].style.backgroundColor = "white";
+        var c = tbl.rows[i].cells[j];
+        c.innerHTML = " ";
+        c.style.color = "#909CD4";
+        c.style.fontWeight = "normal";
+        c.style.backgroundColor = "white";
       }
     }
     for(var i=2; i<tbl.rows.length; i++){
       for(var j=0; j<tbl.rows[i].cells.length; j++){
-        var eventNames = "";
         if(yr===currentYearNum && mth===currentMonthNum){
           if(count===currentDayNum){
             tbl.rows[i].cells[j].style.color = "#5D9DB3";
@@ -222,6 +233,227 @@ function setupCalendar(yr, mth){
   }
 }
 
+function weekViewToMonthView(){
+  document.getElementById("monthlyview").style.display = "inline";
+  document.getElementById("weeklyPanel").style.display = "inline";
+  document.getElementById("weeklyview").style.display = "none";
+  document.getElementById("monthViewButton").style.display = "none";
+  var timeTable = document.querySelector("#weekTimeClick");
+  for(var r=2; r<timeTable.rows.length; r++){
+    for(var c=1; c<timeTable.rows[r].cells.length; c++){
+      if(r===2){
+        timeTable.rows[r].cells[c].style.backgroundColor = "#90a9d4";
+      }
+      else{
+        timeTable.rows[r].cells[c].style.backgroundColor = "white";
+        timeTable.rows[r].cells[c].style.cursor = "auto";
+        timeTable.rows[r].cells[c].innerHTML = " ";
+        if(timeTable.rows[r].cells[c].hasAttribute("onclick")){
+          timeTable.rows[r].cells[c].removeAttribute("onclick");
+        }
+      }
+    }
+  }
+}
+
+function eventDetails(cell){
+  alert(cell.getAttribute("data-time"));
+}
+
+function hoursBetween(t1, t2){
+  var h1 = t1.split(':');
+  var h2 = t2.split(':');
+  return parseInt(h2[0])-parseInt(h1[0]);
+}
+
+function getWeekView(cell){
+  var rowNum = cell.rowIndex+2;
+  var weekHeading = cell.cells[0].innerHTML;
+  var dayArray = new Array();
+  var firstDate = "";
+  var first = false;
+  var lastDate = "";
+  var last = false;
+  var spaceCount = 0;
+  var temptbl = document.getElementById("monthDayClick");
+  for(var i=0; i<temptbl.rows[rowNum].cells.length; i++){
+    dayArray.push(temptbl.rows[rowNum].cells[i]);
+    if(first===false){
+      if(!isNaN(parseInt(temptbl.rows[rowNum].cells[i].innerHTML))){
+        first = true;
+        firstDate = temptbl.rows[rowNum].cells[i];
+      }
+      else{
+        spaceCount += 1;
+      }
+    }
+  }
+  if(spaceCount === 7){
+    return;
+  }
+  for(var i=temptbl.rows[rowNum].cells.length-1; i>=0; i--){
+    if(last===false){
+      if(!isNaN(parseInt(temptbl.rows[rowNum].cells[i].innerHTML))){
+        last = true;
+        lastDate = temptbl.rows[rowNum].cells[i]; //
+      }
+    }
+  }
+
+  var rowOfDates = document.querySelector("#weeklydates");
+  var timeTable = document.querySelector("#weekTimeClick");
+  for(var i=1; i<rowOfDates.cells.length; i++){
+    rowOfDates.cells[i].innerHTML = dayArray[i-1].innerHTML;
+    var dDate = dayArray[i-1].getAttribute("data-date");
+    if(checkDate(dDate)){
+      rowOfDates.cells[i].style.backgroundColor = "gray";
+      //ADD TO HIGHLIGHT HERE
+      for(var e=0; e<dateEvents[dDate].length; e++){
+        var eventTemp = dateEvents[dDate][e];
+        var start = eventTemp.start.split(':')[0] + ":00";
+        var end = eventTemp.end.split(':')[0] + ":00";
+        var eventStart = false;
+        var startCell = null;
+        var eventEnd = false;
+        var hours = hoursBetween(eventTemp.start, eventTemp.end);
+        for(var t=3; t<timeTable.rows.length; t++){
+          var dataTime = timeTable.rows[t].cells[i].getAttribute("data-time");
+          if(!eventStart && start===dataTime){
+            timeTable.rows[t].cells[i].style.backgroundColor = "#AAD5E3";
+            timeTable.rows[t].cells[i].innerHTML = eventTemp.start;
+            if(hours <= 1){
+              //APPEND W/ <P> TAGS
+              timeTable.rows[t].cells[i].innerHTML += "\n" + eventTemp.name;
+              timeTable.rows[t].cells[i].innerHTML += "\n" + eventTemp.end;
+            }
+            timeTable.rows[t].cells[i].setAttribute("onclick", "eventDetails(this)");
+            timeTable.rows[t].cells[i].style.cursor = "pointer";
+            eventStart = true;
+            startCell = timeTable.rows[t].cells[i];
+          }
+          else if(eventStart && !eventEnd){
+            if(end===dataTime){
+              eventEnd = true;
+              break;
+            }
+            timeTable.rows[t].cells[i].style.backgroundColor = "#AAD5E3";
+            timeTable.rows[t].cells[i].setAttribute("onclick", "null");
+            timeTable.rows[t].cells[i].style.cursor = "pointer";
+            timeTable.rows[t].cells[i].onclick = function(){
+              eventDetails(startCell);
+            };
+          }
+        }
+      }
+    }
+  }
+
+  document.getElementById("monthlyview").style.display = "none";
+  document.getElementById("weeklyPanel").style.display = "none";
+  document.getElementById("weeklyview").style.display = "inline";
+  document.getElementById("monthViewButton").style.display = "inline";
+  document.querySelector(".weekview th").innerHTML = weekHeading + ": " + months[tempMonthNum] + " " + firstDate.innerHTML + "-" + lastDate.innerHTML + " " + tempYearNum;
+}
+
+function deleteEvent(event){
+  if(confirm("Do you want to delete the following event? \n\n     " + event.getAttribute("data-name") + " starting at " + event.getAttribute("data-time"))){
+    var dDate = event.getAttribute("data-date");
+    var dTime = event.getAttribute("data-time");
+    var dName = event.getAttribute("data-name");
+    var tempArray = new Array();
+    for(var i=0; i<dateEvents[dDate].length; i++){
+      if(dName !== dateEvents[dDate][i].name && dTime !== dateEvents[dDate][i].start){
+        tempArray.push(dateEvents[dDate][i]);
+      }
+    }
+    dateEvents[dDate] = tempArray;
+    if(document.getElementById("rightdrawer").style.zIndex === "3"){
+      var dl = document.querySelector("dl");
+      var parent = dl.parentNode;
+      var toRemove = new Array();
+      for(var c=3; c<parent.childNodes.length; c++){
+        var n = parent.childNodes[c].getAttribute("data-name");
+        var t = parent.childNodes[c].getAttribute("data-time");
+        if(n===dName && t===dTime){
+          toRemove.push(parent.childNodes[c]);
+        }
+      }
+      for(var r=0; r<toRemove.length; r++){
+        parent.removeChild(toRemove[r]);
+      }
+    }
+  }
+  else{
+    return;
+  }
+}
+
+function SlideEventPanel(cell){
+  if(!isNaN(parseInt(cell.innerHTML))){
+    var dataDate = cell.getAttribute("data-date");
+    var eventsOnDate = checkDate(dataDate);
+    var dl = document.querySelector("dl");
+    var parent = dl.parentNode;
+    var removed = new Array();
+    for(var i=3; i<parent.childNodes.length; i++){
+      removed.push(parent.childNodes[i]);
+    }
+    for(var r=0; r<removed.length; r++){
+      parent.removeChild(removed[r]);
+    }
+    if(document.getElementById("rightdrawer").style.zIndex === "3"){
+      setupCalendar(tempYearNum, tempMonthNum);
+      document.getElementById("addEvent").style.marginRight = "0px";
+      document.getElementById("rightdrawer").style.width = "0px";
+      document.getElementById("rightdrawer").style.zIndex="-1";
+    }
+    else{
+      prevCell = cell;
+      var color = "#90a9d4";
+      if(eventsOnDate){
+        color = "gray";
+        for(var i=0; i<dateEvents[dataDate].length; i++){
+          var ddTime = document.createElement("dd");
+
+          var timeText = document.createTextNode(dateEvents[dataDate][i].start + " - " + dateEvents[dataDate][i].end + "  ");
+          ddTime.appendChild(timeText);
+          //ADDING DELETE BUTTON HERE FOR SIDEPANEL
+          var delButton = document.createElement("button");
+          delButton.classname = "delEvent";
+          delButton.setAttribute("data-name", dateEvents[dataDate][i].name);
+          delButton.setAttribute("data-time", dateEvents[dataDate][i].start);
+          delButton.setAttribute("data-date", dataDate);
+          delButton.onclick = function(){
+            deleteEvent(this);
+          }
+          var delText = document.createTextNode("x");
+          delButton.appendChild(delText);
+          ddTime.appendChild(delButton);
+          ddTime.setAttribute("data-name", dateEvents[dataDate][i].name);
+          ddTime.setAttribute("data-time", dateEvents[dataDate][i].start);
+
+          timeText.parentNode.className = "datetime";
+          parent.insertBefore(ddTime, null);
+          //alert(dateEvents[dataDate][i].start==="08:00");
+          var ddName = document.createElement("dd")
+          var nameText = document.createTextNode(dateEvents[dataDate][i].name);
+          ddName.appendChild(nameText);
+          nameText.parentNode.className = "datetitle";
+          ddName.setAttribute("data-name", dateEvents[dataDate][i].name);
+          ddName.setAttribute("data-time", dateEvents[dataDate][i].start);
+          parent.insertBefore(ddName, null);
+        }
+      }
+      cell.style.backgroundColor = color;
+      cell.style.color = "white";
+      document.getElementById("addEvent").style.marginRight = "105px";
+      document.getElementById("drawerHeader").innerHTML = weekdays[cell.cellIndex] + ", " + monthsAbbr[tempMonthNum] + " " + cell.innerHTML + " " + tempYearNum;
+      document.getElementById("rightdrawer").style.zIndex="3";
+      document.getElementById("rightdrawer").style.width = "250px";
+    }
+  }
+}
+
 var prevCell = null;
 window.onload = function () {
  setupCalendar(currentYearNum, currentMonthNum);
@@ -234,100 +466,13 @@ window.onload = function () {
     }
   }
 
-  var tbl = document.getElementById("monthDayClick");
-  if(tbl != null){
-    for(var i=2; i<tbl.rows.length; i++){
-      for(var j=0; j<tbl.rows[i].cells.length; j++){
-        tbl.rows[i].cells[j].onclick = function () {
+  var monthDaysTable = document.getElementById("monthDayClick");
+  if(monthDaysTable != null){
+    for(var i=2; i<monthDaysTable.rows.length; i++){
+      for(var j=0; j<monthDaysTable.rows[i].cells.length; j++){
+        monthDaysTable.rows[i].cells[j].onclick = function () {
           SlideEventPanel(this);
         };
-      }
-    }
-  }
-
-  function getWeekView(cell){
-    var rowNum = cell.rowIndex+2;
-    var weekHeading = cell.cells[0].innerHTML;
-    var dayArray = new Array();
-    var firstDate = "";
-    var first = false;
-    var lastDate = "";
-    var last = false;
-    var temptbl = document.getElementById("monthDayClick");
-    for(var i=0; i<temptbl.rows[rowNum].cells.length; i++){
-      dayArray.push(temptbl.rows[rowNum].cells[i].innerHTML);
-      if(first===false){
-        if(!isNaN(parseInt(temptbl.rows[rowNum].cells[i].innerHTML))){
-          first = true;
-          firstDate = temptbl.rows[rowNum].cells[i].innerHTML;
-        }
-      }
-    }
-    for(var i=temptbl.rows[rowNum].cells.length-1; i>=0; i--){
-      if(last===false){
-        if(!isNaN(parseInt(temptbl.rows[rowNum].cells[i].innerHTML))){
-          last = true;
-          lastDate = temptbl.rows[rowNum].cells[i].innerHTML; //
-        }
-      }
-    }
-
-    var rowOfDates = document.querySelector("#weeklydates");
-    for(var i=1; i<rowOfDates.cells.length; i++){
-      rowOfDates.cells[i].innerHTML = dayArray[i-1];
-    }
-
-    document.getElementById("monthlyview").style.display = "none";
-    document.getElementById("weeklyPanel").style.display = "none";
-    document.getElementById("weeklyview").style.display = "inline";
-    document.querySelector(".weekview th").innerHTML = weekHeading + ": " + months[tempMonthNum] + " " + firstDate + "-" + lastDate + " " + tempYearNum;
-  }
-
-  function SlideEventPanel(cell){
-    if(!isNaN(parseInt(cell.innerHTML))){
-      var dataDate = cell.getAttribute("data-date");
-      var eventsOnDate = checkDate(dataDate);
-      var dl = document.querySelector("dl");
-      var parent = dl.parentNode;
-      if(document.getElementById("rightdrawer").style.zIndex === "3"){
-        prevCell.style.color= "#90a9d4";
-        var color = "white";
-        if(eventsOnDate){
-          color = "#AAD5E3"
-          for(var i=0; i<dateEvents[dataDate].length*2; i++){
-            parent.removeChild(parent.lastChild);
-          }
-        }
-        prevCell.style.backgroundColor=color;
-        document.getElementById("addEvent").style.marginRight = "0px";
-        document.getElementById("rightdrawer").style.width = "0px";
-        document.getElementById("rightdrawer").style.zIndex="-1";
-      }
-      else{
-        prevCell = cell;
-        var color = "#90a9d4";
-        if(eventsOnDate){
-          color = "gray";
-          for(var i=0; i<dateEvents[dataDate].length; i++){
-            var ddTime = document.createElement("dd");
-            var timeText = document.createTextNode(dateEvents[dataDate][i].start + " - " + dateEvents[dataDate][i].end);
-            ddTime.appendChild(timeText);
-            timeText.parentNode.className = "datetime";
-            parent.insertBefore(ddTime, null);
-
-            var ddName = document.createElement("dd")
-            var nameText = document.createTextNode(dateEvents[dataDate][i].name);
-            ddName.appendChild(nameText);
-            nameText.parentNode.className = "datetitle";
-            parent.insertBefore(ddName, null);
-          }
-        }
-        cell.style.backgroundColor = color;
-        cell.style.color = "white";
-        document.getElementById("addEvent").style.marginRight = "105px";
-        document.getElementById("drawerHeader").innerHTML = weekdays[cell.cellIndex] + ", " + monthsAbbr[tempMonthNum] + " " + cell.innerHTML + " " + tempYearNum;
-        document.getElementById("rightdrawer").style.zIndex="3";
-        document.getElementById("rightdrawer").style.width = "250px";
       }
     }
   }

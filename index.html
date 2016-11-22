@@ -30,12 +30,6 @@
   <div id="rightdrawer">
     <dl>
       <dt class="date" id="drawerHeader">Mon, Nov 14th 2016</dt>
-        <!-- <dd class="datetime">Event Time</dd>
-        <dd class="datetitle">Event Title</dd>
-        <dd class="datetime">Event2 Time</dd>
-        <dd class="datetitle">Event2 Title</dd>
-        <dd class="datetime">Event3 Time</dd>
-        <dd class="datetitle">Event3 Title</dd> -->
     </dl>
   </div>
 
@@ -56,6 +50,9 @@
       </tr>
       <tr>
         <td>Week 5</td>
+      </tr>
+      <tr>
+        <td>Week 6</td>
       </tr>
     </table>
   </div>
@@ -126,6 +123,15 @@
         <td> </td>
         <td> </td>
       </tr>
+      <tr class="days">
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+        <td> </td>
+      </tr>
     </table>
   </div>
   <div id="addEvent">
@@ -134,19 +140,20 @@
 
 <!--WEEKLY VIEW-->
   <div id="weeklyview">
+  <button id="monthViewButton" onclick="weekViewToMonthView()">Back to Monthly View</button>
   <table class="view" id="weekTimeClick">
     <tr class="weekview">
       <th colspan="8">Week</th>
     </tr>
     <tr class="weekdays">
       <td id="weekcellone"> </td>
-      <td>Sunday</td>
-      <td>Monday</td>
-      <td>Tuesday</td>
-      <td>Wednesday</td>
-      <td>Thursday</td>
-      <td>Friday</td>
-      <td>Saturday</td>
+      <td>SUN</td>
+      <td>MON</td>
+      <td>TUE</td>
+      <td>WED</td>
+      <td>THU</td>
+      <td>FRI</td>
+      <td>SAT</td>
     </tr>
     <tr id="weeklydates">
       <td class="timeslots">Time</td>
@@ -160,73 +167,242 @@
     </tr>
     <tr class="weeklyevents">
       <td class="hours">12:00 AM</td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
+      <td data-time="24:00"> </td>
+      <td data-time="24:00"> </td>
+      <td data-time="24:00"> </td>
+      <td data-time="24:00"> </td>
+      <td data-time="24:00"> </td>
+      <td data-time="24:00"> </td>
+      <td data-time="24:00"> </td>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">1:00 AM</td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
+      <td data-time="01:00"> </td>
+      <td data-time="01:00"> </td>
+      <td data-time="01:00"> </td>
+      <td data-time="01:00"> </td>
+      <td data-time="01:00"> </td>
+      <td data-time="01:00"> </td>
+      <td data-time="01:00"> </td>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">2:00 AM</td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
+      <td data-time="02:00"> </td>
+      <td data-time="02:00"> </td>
+      <td data-time="02:00"> </td>
+      <td data-time="02:00"> </td>
+      <td data-time="02:00"> </td>
+      <td data-time="02:00"> </td>
+      <td data-time="02:00"> </td>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">3:00 AM</td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
+      <td data-time="03:00"> </td>
+      <td data-time="03:00"> </td>
+      <td data-time="03:00"> </td>
+      <td data-time="03:00"> </td>
+      <td data-time="03:00"> </td>
+      <td data-time="03:00"> </td>
+      <td data-time="03:00"> </td>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">4:00 AM</td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
+      <td data-time="04:00"> </td>
+      <td data-time="04:00"> </td>
+      <td data-time="04:00"> </td>
+      <td data-time="04:00"> </td>
+      <td data-time="04:00"> </td>
+      <td data-time="04:00"> </td>
+      <td data-time="04:00"> </td>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">5:00 AM</td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
+      <td data-time="05:00"> </td>
+      <td data-time="05:00"> </td>
+      <td data-time="05:00"> </td>
+      <td data-time="05:00"> </td>
+      <td data-time="05:00"> </td>
+      <td data-time="05:00"> </td>
+      <td data-time="05:00"> </td>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">6:00 AM</td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
-      <td> </td>
+      <td data-time="06:00"> </td>
+      <td data-time="06:00"> </td>
+      <td data-time="06:00"> </td>
+      <td data-time="06:00"> </td>
+      <td data-time="06:00"> </td>
+      <td data-time="06:00"> </td>
+      <td data-time="06:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">7:00 AM</td>
+      <td data-time="07:00"> </td>
+      <td data-time="07:00"> </td>
+      <td data-time="07:00"> </td>
+      <td data-time="07:00"> </td>
+      <td data-time="07:00"> </td>
+      <td data-time="07:00"> </td>
+      <td data-time="07:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">8:00 AM</td>
+      <td data-time="08:00"> </td>
+      <td data-time="08:00"> </td>
+      <td data-time="08:00"> </td>
+      <td data-time="08:00"> </td>
+      <td data-time="08:00"> </td>
+      <td data-time="08:00"> </td>
+      <td data-time="08:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">9:00 AM</td>
+      <td data-time="09:00"> </td>
+      <td data-time="09:00"> </td>
+      <td data-time="09:00"> </td>
+      <td data-time="09:00"> </td>
+      <td data-time="09:00"> </td>
+      <td data-time="09:00"> </td>
+      <td data-time="09:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">10:00 AM</td>
+      <td data-time="10:00"> </td>
+      <td data-time="10:00"> </td>
+      <td data-time="10:00"> </td>
+      <td data-time="10:00"> </td>
+      <td data-time="10:00"> </td>
+      <td data-time="10:00"> </td>
+      <td data-time="10:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">11:00 AM</td>
+      <td data-time="11:00"> </td>
+      <td data-time="11:00"> </td>
+      <td data-time="11:00"> </td>
+      <td data-time="11:00"> </td>
+      <td data-time="11:00"> </td>
+      <td data-time="11:00"> </td>
+      <td data-time="11:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">12:00 PM</td>
+      <td data-time="12:00"> </td>
+      <td data-time="12:00"> </td>
+      <td data-time="12:00"> </td>
+      <td data-time="12:00"> </td>
+      <td data-time="12:00"> </td>
+      <td data-time="12:00"> </td>
+      <td data-time="12:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">1:00 PM</td>
+      <td data-time="13:00"> </td>
+      <td data-time="13:00"> </td>
+      <td data-time="13:00"> </td>
+      <td data-time="13:00"> </td>
+      <td data-time="13:00"> </td>
+      <td data-time="13:00"> </td>
+      <td data-time="13:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">2:00 PM</td>
+      <td data-time="14:00"> </td>
+      <td data-time="14:00"> </td>
+      <td data-time="14:00"> </td>
+      <td data-time="14:00"> </td>
+      <td data-time="14:00"> </td>
+      <td data-time="14:00"> </td>
+      <td data-time="14:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">3:00 PM</td>
+      <td data-time="15:00"> </td>
+      <td data-time="15:00"> </td>
+      <td data-time="15:00"> </td>
+      <td data-time="15:00"> </td>
+      <td data-time="15:00"> </td>
+      <td data-time="15:00"> </td>
+      <td data-time="15:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">4:00 PM</td>
+      <td data-time="16:00"> </td>
+      <td data-time="16:00"> </td>
+      <td data-time="16:00"> </td>
+      <td data-time="16:00"> </td>
+      <td data-time="16:00"> </td>
+      <td data-time="16:00"> </td>
+      <td data-time="16:00"> </td>
+    </tr><tr class="weeklyevents">
+      <td class="hours">5:00 PM</td>
+      <td data-time="17:00"> </td>
+      <td data-time="17:00"> </td>
+      <td data-time="17:00"> </td>
+      <td data-time="17:00"> </td>
+      <td data-time="17:00"> </td>
+      <td data-time="17:00"> </td>
+      <td data-time="17:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">6:00 PM</td>
+      <td data-time="18:00"> </td>
+      <td data-time="18:00"> </td>
+      <td data-time="18:00"> </td>
+      <td data-time="18:00"> </td>
+      <td data-time="18:00"> </td>
+      <td data-time="18:00"> </td>
+      <td data-time="18:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">7:00 PM</td>
+      <td data-time="19:00"> </td>
+      <td data-time="19:00"> </td>
+      <td data-time="19:00"> </td>
+      <td data-time="19:00"> </td>
+      <td data-time="19:00"> </td>
+      <td data-time="19:00"> </td>
+      <td data-time="19:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">8:00 PM</td>
+      <td data-time="20:00"> </td>
+      <td data-time="20:00"> </td>
+      <td data-time="20:00"> </td>
+      <td data-time="20:00"> </td>
+      <td data-time="20:00"> </td>
+      <td data-time="20:00"> </td>
+      <td data-time="20:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">9:00 PM</td>
+      <td data-time="21:00"> </td>
+      <td data-time="21:00"> </td>
+      <td data-time="21:00"> </td>
+      <td data-time="21:00"> </td>
+      <td data-time="21:00"> </td>
+      <td data-time="21:00"> </td>
+      <td data-time="21:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">10:00 PM</td>
+      <td data-time="22:00"> </td>
+     <td data-time="22:00"> </td>
+     <td data-time="22:00"> </td>
+     <td data-time="22:00"> </td>
+     <td data-time="22:00"> </td>
+     <td data-time="22:00"> </td>
+     <td data-time="22:00"> </td>
+    </tr>
+    <tr class="weeklyevents">
+      <td class="hours">11:00 PM</td>
+      <td data-time="23:00"> </td>
+      <td data-time="23:00"> </td>
+      <td data-time="23:00"> </td>
+      <td data-time="23:00"> </td>
+      <td data-time="23:00"> </td>
+      <td data-time="23:00"> </td>
+      <td data-time="23:00"> </td>
     </tr>
   </table>
 </div>
