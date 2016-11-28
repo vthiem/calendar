@@ -353,6 +353,7 @@ function getWeekView(cell){
         var startCell = null;
         var eventEnd = false;
         var hours = hoursBetween(eventTemp.start, eventTemp.end);
+        var hoursCounted = 0; //WORKING HERE
         for(var t=3; t<timeTable.rows.length; t++){
           var dataTime = timeTable.rows[t].cells[i].getAttribute("data-time");
           if(!eventStart && start===dataTime){
@@ -360,8 +361,17 @@ function getWeekView(cell){
             timeTable.rows[t].cells[i].innerHTML = eventTemp.start;
             if(hours <= 1){
               //APPEND W/ <P> TAGS
-              timeTable.rows[t].cells[i].innerHTML += "\n" + eventTemp.name;
-              timeTable.rows[t].cells[i].innerHTML += "\n" + eventTemp.end;
+              var pName = document.createElement("p");
+              pName.innerHTML = eventTemp.name;
+              timeTable.rows[t].cells[i].appendChild(pName);
+              var pEnd = document.createElement("p");
+              pEnd.innerHTML = eventTemp.end;
+              timeTable.rows[t].cells[i].appendChild(pEnd);
+            }
+            else if(hours == 2){
+              var pName = document.createElement("p");
+              pName.innerHTML = eventTemp.name;
+              timeTable.rows[t].cells[i].appendChild(pName);
             }
             timeTable.rows[t].cells[i].setAttribute("onclick", "eventDetails(this)");
             timeTable.rows[t].cells[i].style.cursor = "pointer";
@@ -372,6 +382,11 @@ function getWeekView(cell){
             if(end===dataTime){
               eventEnd = true;
               break;
+            }
+            if(hours==2){
+              var pEnd = document.createElement("p");
+              pEnd.innerHTML = eventTemp.end;
+              timeTable.rows[t].cells[i].appendChild(pEnd);
             }
             timeTable.rows[t].cells[i].style.backgroundColor = "#AAD5E3";
             timeTable.rows[t].cells[i].setAttribute("onclick", "null");
