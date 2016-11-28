@@ -4,6 +4,8 @@
 <head>
   <title>Portal Calendar</title>
   <link rel="stylesheet" href="style.css"></link>
+  <script type = "text/javascript"
+         src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script type="text/javascript" src="calendar.js"></script>
 </head>
 
@@ -12,15 +14,16 @@
   <!--EDIT POPUP-->
   <div id="editpopup">
     <h1>Edit Event</h1>
-    <form id="eventInputs"> <!--action="info.php"-->
-      <p>Event Title: <input type="text" name="eventName"></p>
-      <p>Start: <input type="time" name="eventStartTime">   End: <input type="time" name="eventEndTime"></p>
-      <p>Date: <input type="date" name="eventDate"></p>
-      <p>Details: <input type="text" name="eventDetails"></p>
-      <p>Repeat: <input type="checkbox" name="eventRepeat" id="repeatOptionButton" onclick="repeatOption()"></p>
-      <p>None: <input type="radio" name="repeat" value="none" checked disabled="true" id="repNone" onclick="resetWeekly()">   Weekly: <input type="radio" name="repeat" value="weekly" disabled="true" id="repWeekly" onclick="repWeeklyOptions()">   Monthly: <input type="radio" name="repeat" value="monthly" disabled="true" id="repMonthly" onclick="resetWeekly()"></p>
-      <p><input type="checkbox" name="weeklySun" value="Sun" disabled="true" id="Sun">Sun <input type="checkbox" name="weeklyMon" value="Mon" disabled="true" id="Mon">Mon <input type="checkbox" name="weeklyTue" value="Tue" disabled="true" id="Tue">Tue <input type="checkbox" name="weeklyWed" value="Wed" disabled="true" id="Wed">Wed <input type="checkbox" name="weeklyThu" value="Thu" disabled="true" id="Thu">Thu <input type="checkbox" name="weeklyFri" value="Fri" disabled="true" id="Fri">Fri <input type="checkbox" name="weeklySat" value="Sat" disabled="true" id="Sat">Sat</p>
-      <p><input type="button" value="Submit" onclick="formHandling()"></p>
+    <form name="eventInputs" id="eventInputs" onsubmit="return false">
+      <label>Event Title: <input type="text" name="eventName" required></label>
+      <p><label>Start: <input type="time" name="eventStartTime" required>   End: <input type="time" name="eventEndTime" required></label></p>
+      <p><label>Date: <input type="date" name="eventDate" required></label></p>
+      <p><label>Details: <input type="text" name="eventDetails"></label></p>
+      <p><label>Repeat: <input type="checkbox" name="eventRepeat" id="repeatOptionButton" onclick="repeatOption()"></label></p>
+      <p><label>None: <input type="radio" name="repeat" value="none" checked disabled="true" id="repNone" onclick="resetWeekly()">   Weekly: <input type="radio" name="repeat" value="weekly" disabled="true" id="repWeekly" onclick="repWeeklyOptions()">   Monthly: <input type="radio" name="repeat" value="monthly" disabled="true" id="repMonthly" onclick="resetWeekly()"></label></p>
+      <p><label><input type="checkbox" name="weeklySun" value="Sun" disabled="true" id="Sun">Sun <input type="checkbox" name="weeklyMon" value="Mon" disabled="true" id="Mon">Mon <input type="checkbox" name="weeklyTue" value="Tue" disabled="true" id="Tue">Tue <input type="checkbox" name="weeklyWed" value="Wed" disabled="true" id="Wed">Wed <input type="checkbox" name="weeklyThu" value="Thu" disabled="true" id="Thu">Thu <input type="checkbox" name="weeklyFri" value="Fri" disabled="true" id="Fri">Fri <input type="checkbox" name="weeklySat" value="Sat" disabled="true" id="Sat">Sat</label></p>
+      <label><button type="submit" onclick="formHandling()">Submit</button></label>
+      <!-- <p><label><input type="button" value="Submit" onsubmit="formHandling()"></label></p> -->
     </form>
     <button id="exitEdit" onclick="cancelEdit()">x</button>
   </div>

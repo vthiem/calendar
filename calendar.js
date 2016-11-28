@@ -12,7 +12,7 @@ var dateEvents = {
 }
 
 var events = new Array();
-function Event(n, s, e, d, det, rep, repDays){
+function Event(n, s, e, d, det, rep, repDays, id){
   this.name = n;
   this.start = s;
   this.end = e;
@@ -20,6 +20,7 @@ function Event(n, s, e, d, det, rep, repDays){
   this.details = det;
   this.repeat = rep;
   this.repeatDays = repDays;
+  this.id = id;
 }
 
 function checkDate(celldate){
@@ -88,9 +89,28 @@ function repWeeklyOptions(){
   }
 }
 
-function sortEvents(eventList){
-
+function sortEvents(eventList, newEvent){
+  var index = null;
+  for(var i=0; i<eventList.length; i++){
+    if(eventList[i].start > newEvent.start){
+      index = i;
+      break;
+    }
+  }
+  eventList.splice(index, 0, newEvent);
 }
+
+function addToDateEvents(eName, eStartTime, eEndTime, eDate, eDetails, eRepeatDuration, eRepeatDays, eID){
+  var fullEvent = new Event(eName, eStartTime, eEndTime, eDate, eDetails, eRepeatDuration, eRepeatDays, eID);
+  if(dateEvents.hasOwnProperty(eDate)){
+    sortEvents(dateEvents[eDate], fullEvent);
+  }
+  else{
+    dateEvents[eDate] = new Array();
+    dateEvents[eDate].push(fullEvent);
+  }
+}
+
 
 function formHandling(){
   var formData = new FormData(document.querySelector("#eventInputs"));
@@ -103,15 +123,32 @@ function formHandling(){
   var eRepeatDuration = formData.get("repeat");
   var eRepeatDays = [formData.get("weeklySun"), formData.get("weeklyMon"), formData.get("weeklyTue"), formData.get("weeklyWed"), formData.get("weeklyThu"), formData.get("weeklyFri"), formData.get("weeklySat")];
 
-  var fullEvent = new Event(eName, eStartTime, eEndTime, eDate, eDetails, eRepeatDuration, eRepeatDays);
-  if(dateEvents.hasOwnProperty(eDate)){
-    dateEvents[eDate].push(fullEvent);
-  }
-  else{
-    dateEvents[eDate] = new Array();
-    dateEvents[eDate].push(fullEvent);
-  }
-  setupCalendar(tempYearNum, tempMonthNum);
+  $.post(
+    "http://thiman.me:1337/vanessa",
+    {
+      eventName: eName,
+      eventDate: eDate,
+      eventStart: eStartTime,
+      eventEnd: eEndTime,
+      eventDesc: eDetails,
+      eventRepeat: eRepeatDuration,
+      eventRepeatDays: eRepeatDays
+    },
+    function(data){
+      var eInfo = $.parseJSON(data);
+      var eID = eInfo.data._id;
+      addToDateEvents(eName, eStartTime, eEndTime, eDate, eDetails, eRepeatDuration, eRepeatDays, eID);
+      // if(dateEvents.hasOwnProperty(eDate)){
+      //   sortEvents(dateEvents[eDate], fullEvent);
+      // }
+      // else{
+      //   dateEvents[eDate] = new Array();
+      //   dateEvents[eDate].push(fullEvent);
+      // }
+      setupCalendar(tempYearNum, tempMonthNum);
+    },
+    'text'
+  );
 }
 
 function editpopup(){
@@ -360,6 +397,7 @@ function deleteEvent(event){
     var dDate = event.getAttribute("data-date");
     var dTime = event.getAttribute("data-time");
     var dName = event.getAttribute("data-name");
+    var dID = event.getAttribute("data-id");
     var tempArray = new Array();
     for(var i=0; i<dateEvents[dDate].length; i++){
       if(dName !== dateEvents[dDate][i].name && dTime !== dateEvents[dDate][i].start){
@@ -367,6 +405,13 @@ function deleteEvent(event){
       }
     }
     dateEvents[dDate] = tempArray;
+    $.ajax({
+      url: 'http://thiman.me:1337/vanessa/' + dID,
+      type: 'DELETE',
+      success: function(result){
+
+      }
+    });
     if(document.getElementById("rightdrawer").style.zIndex === "3"){
       var dl = document.querySelector("dl");
       var parent = dl.parentNode;
@@ -423,6 +468,7 @@ function SlideEventPanel(cell){
           delButton.setAttribute("data-name", dateEvents[dataDate][i].name);
           delButton.setAttribute("data-time", dateEvents[dataDate][i].start);
           delButton.setAttribute("data-date", dataDate);
+          delButton.setAttribute("data-id", dateEvents[dataDate][i].id);
           delButton.onclick = function(){
             deleteEvent(this);
           }
@@ -454,9 +500,35 @@ function SlideEventPanel(cell){
   }
 }
 
+function loadEvents(){
+  $.ajax({
+    url: 'http://thiman.me:1337/vanessa/',
+    type: 'GET',
+    dataType: 'text',
+    success: function(data){
+      var temp = $.parseJSON(data);
+      for(var i=0; i<temp.data.length; i++){
+        var eventAdd = temp.data[i];
+
+        var eName = eventAdd.eventName;
+        var eStartTime = eventAdd.eventStart;
+        var eEndTime = eventAdd.eventEnd;
+        var eDate = eventAdd.eventDate;
+        var eDetails = eventAdd.eventDesc;
+        var eRepeatDuration = eventAdd.eventRepeat;
+        var eRepeatDays = [eventAdd["eventRepeatDays[0]"], eventAdd["eventRepeatDays[1]"], eventAdd["eventRepeatDays[2]"], eventAdd["eventRepeatDays[3]"], eventAdd["eventRepeatDays[4]"], eventAdd["eventRepeatDays[5]"], eventAdd["eventRepeatDays[6]"]];
+        var eID = eventAdd._id;
+        addToDateEvents(eName, eStartTime, eEndTime, eDate, eDetails, eRepeatDuration, eRepeatDays, eID);
+        setupCalendar(currentYearNum, currentMonthNum);
+      }
+    }
+  });
+}
+
 var prevCell = null;
 window.onload = function () {
- setupCalendar(currentYearNum, currentMonthNum);
+  loadEvents();
+ // setupCalendar(currentYearNum, currentMonthNum);
   var weekPanelTbl = document.getElementById("weeklyPanelClick");
   if(weekPanelTbl != null){
     for(var i=0; i<weekPanelTbl.rows.length; i++){
