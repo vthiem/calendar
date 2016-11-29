@@ -517,25 +517,29 @@ function SlideEventPanel(cell){
 
 function loadEvents(){
   $.ajax({
-    url: 'http://thiman.me:1337/vanessa/',
+    url: 'http://localhost:3000/events/', //'http://thiman.me:1337/vanessa/',
     type: 'GET',
-    dataType: 'text',
+    dataType: 'json',
     success: function(data){
-      var temp = $.parseJSON(data);
-      for(var i=0; i<temp.data.length; i++){
-        var eventAdd = temp.data[i];
-
-        var eName = eventAdd.eventName;
-        var eStartTime = eventAdd.eventStart;
-        var eEndTime = eventAdd.eventEnd;
-        var eDate = eventAdd.eventDate;
-        var eDetails = eventAdd.eventDesc;
-        var eRepeatDuration = eventAdd.eventRepeat;
-        var eRepeatDays = [eventAdd["eventRepeatDays[0]"], eventAdd["eventRepeatDays[1]"], eventAdd["eventRepeatDays[2]"], eventAdd["eventRepeatDays[3]"], eventAdd["eventRepeatDays[4]"], eventAdd["eventRepeatDays[5]"], eventAdd["eventRepeatDays[6]"]];
-        var eID = eventAdd._id;
-        addToDateEvents(eName, eStartTime, eEndTime, eDate, eDetails, eRepeatDuration, eRepeatDays, eID);
-        setupCalendar(currentYearNum, currentMonthNum);
-      }
+      alert("in here");
+      // var temp = $.parseJSON(data);
+      // for(var i=0; i<temp.data.length; i++){
+      //   var eventAdd = temp.data[i];
+      //
+      //   var eName = eventAdd.eventName;
+      //   var eStartTime = eventAdd.eventStart;
+      //   var eEndTime = eventAdd.eventEnd;
+      //   var eDate = eventAdd.eventDate;
+      //   var eDetails = eventAdd.eventDesc;
+      //   var eRepeatDuration = eventAdd.eventRepeat;
+      //   var eRepeatDays = [eventAdd["eventRepeatDays[0]"], eventAdd["eventRepeatDays[1]"], eventAdd["eventRepeatDays[2]"], eventAdd["eventRepeatDays[3]"], eventAdd["eventRepeatDays[4]"], eventAdd["eventRepeatDays[5]"], eventAdd["eventRepeatDays[6]"]];
+      //   var eID = eventAdd._id;
+      //   addToDateEvents(eName, eStartTime, eEndTime, eDate, eDetails, eRepeatDuration, eRepeatDays, eID);
+      //   setupCalendar(currentYearNum, currentMonthNum);
+      // }
+    },
+    error: function(XMLHttpRequest, textStatus, error){
+      alert("Status: " + textStatus + " ErrorType: " + error);
     }
   });
 }
