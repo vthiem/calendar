@@ -2,11 +2,14 @@
 <html>
 
 <head>
-  <title>Portal Calendar</title>
-  <link rel="stylesheet" href="style.css"></link>
+  <title><%= fullDate %></title>
+  <link rel="stylesheet" href="./stylesheets/monthlystyle.css"></link>
+  <script>
+    var currentDate = new Date('<%= currentDay %>');
+  </script>
   <script type = "text/javascript"
          src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script type="text/javascript" src="calendar.js"></script>
+  <script type="text/javascript" src="./javascripts/calendar.js"></script>
 </head>
 
 <body>
@@ -14,7 +17,7 @@
   <!--EVENT DETAILS POPUP-->
   <div id="eventdetailspopup">
     <h1 id="detailsName">Event Name</h1>
-    <p id="detailsDate">Date: </p>
+    <p id="detailsDate">Starting Date: </p>
     <p id="detailsStartTime">Starting Time: </p>
     <p id="detailsEndTime">Ending Time: </p>
     <p id="detailsDetails">Details: </p>
@@ -81,7 +84,7 @@
 
     <table class="view" id="monthDayClick">
       <tr class="month">
-        <th colspan="7" id="monthHeader"> </th>
+        <th colspan="7" id="monthHeader"><%= monthHeader %></th>
       </tr>
       <tr class="weekdays">
         <td>Sun</td>
