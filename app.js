@@ -9,10 +9,12 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var events = require('./routes/events');
 var calendar = require('./routes/calendar');
+var weeklyview = require('./routes/weeklyview');
 
 var app = express();
 
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 mongoose.connect('mongodb://localhost/test');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: '));
@@ -41,6 +43,7 @@ app.use(function(req, res, next){
 app.use('/', calendar); //index before
 app.use('/users', users);
 app.use('/events', events);
+app.use('/weekly', weeklyview);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

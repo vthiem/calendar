@@ -3,13 +3,14 @@
 
 <head>
   <title><%= fullDate %></title>
-  <link rel="stylesheet" href="./stylesheets/monthlystyle.css"></link>
+  <link rel="stylesheet" href="./stylesheets/weeklystyle.css"></link>
   <script>
     var currentDate = new Date('<%= currentDay %>');
+    var currWeekNum = <%=weekNum%>;
   </script>
   <script type = "text/javascript"
          src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script type="text/javascript" src="./javascripts/calendar.js"></script>
+  <script type="text/javascript" src="./javascripts/weekly.js"></script>
 </head>
 
 <body>
@@ -162,7 +163,7 @@
   <button id="monthViewButton" onclick="weekViewToMonthView()">Back to Monthly View</button>
   <table class="view" id="weekTimeClick">
     <tr class="weekview">
-      <th colspan="8">Week</th>
+      <th colspan="8">Week <%=weekNumHeader%></th>
     </tr>
     <tr class="weekdays">
       <td id="weekcellone"> </td>
@@ -176,13 +177,16 @@
     </tr>
     <tr id="weeklydates">
       <td class="timeslots">Time</td>
+      <!-- <td> </td>
       <td> </td>
       <td> </td>
       <td> </td>
       <td> </td>
       <td> </td>
-      <td> </td>
-      <td> </td>
+      <td> </td> -->
+      <% for(var i=0; i<dates.length; i++) {%>
+        <td><%=dates[i]%></td>
+      <% } %>
     </tr>
     <tr class="weeklyevents">
       <td class="hours">12:00 AM</td>

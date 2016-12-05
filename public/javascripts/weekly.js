@@ -377,8 +377,16 @@ function hoursBetween(t1, t2){
 }
 
 function getWeekView(cell){
-  var rowNum = cell.rowIndex+2;
-  var weekHeading = cell.cells[0].innerHTML;
+  var rowNum = null;
+  var weekHeading = null;
+  if(typeof cell === "number"){
+    rowNum = (cell-1)+2;
+    weekHeading = "Week " + cell;
+  }
+  else{
+    rowNum = cell.rowIndex+2;
+    weekHeading = cell.cells[0].innerHTML;
+  }
   var dayArray = new Array();
   var firstDate = "";
   var first = false;
@@ -432,6 +440,7 @@ function getWeekView(cell){
           timeTable.rows[t].cells[i].style.fontSize = "14px";
           timeTable.rows[t].cells[i].style.textAlign = "center";
           timeTable.rows[t].cells[i].setAttribute("data-id", eventTemp.id);
+          timeTable.rows[t].cells[i].setAttribute("data-date", eventTemp.startDate.split('T')[0]);
           if(!eventStart && start===dataTime){
             timeTable.rows[t].cells[i].style.backgroundColor = "#AAD5E3";
             var pStart = document.createElement("p");
@@ -565,9 +574,6 @@ function SlideEventPanel(cell){
         color = "gray";
         for(var i=0; i<dateEvents[dataDate].length; i++){
           var ddTime = document.createElement("dd");
-          // ddTime.onclick = function(){
-          //   alert("clicked");
-          // };
           ddTime.style.cursor = "pointer";
           var timeText = document.createTextNode(dateEvents[dataDate][i].sTime + " - " + dateEvents[dataDate][i].eTime + "  ");
           ddTime.appendChild(timeText);
@@ -596,9 +602,7 @@ function SlideEventPanel(cell){
           parent.insertBefore(delButton, null);
           parent.insertBefore(ddTime, null);
           var ddName = document.createElement("dd");
-          // ddName.onclick = function(){
-          //   alert("clicked");
-          // }
+
           ddName.style.cursor = "pointer";
           var nameText = document.createTextNode(dateEvents[dataDate][i].name);
           ddName.appendChild(nameText);
@@ -656,6 +660,7 @@ function loadEvents(){
 var prevCell = null;
 window.onload = function () {
   loadEvents();
+  getWeekView(currWeekNum);
  // setupCalendar(currentYearNum, currentMonthNum);
   var weekPanelTbl = document.getElementById("weeklyPanelClick");
   if(weekPanelTbl != null){
