@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <link rel='stylesheet' href='/stylesheets/userstyle.css' />
+  </head>
+  <body>
+    <h1>Login</h1>
+    <p id="msg"><%=msg%></p>
+    <p>Please enter your login credentials: </p>
+    <form method="post">
+      <p><label>Username: <input type="text" name="user" value=<%=username%>></label></p>
+      <p><label>Password: <input type="password" name="pass" value=<%=password%>></label></p>
+      <p><input type="submit" class="links"> <button formaction="/" class="links">Cancel</button></p>
+    </form>
+  </body>
+</html>

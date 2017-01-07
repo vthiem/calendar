@@ -6,56 +6,79 @@ var router = express.Router();
 
 /* GET monthly calendar page. */
 router.get('/', function(req, res, next){
-  var currentDate = moment();
-  if(req.query.date){
-    currentDate = moment(req.query.date);
-  }
+  // req.session.reset();
+  if(req.session && req.session.user){
+    var currentDate = moment();
+    if(req.query.date){
+      currentDate = moment(req.query.date);
+    }
 
-  var tempCurr = moment(currentDate);
-  var testing = currentDate.weekday();
-  var firstMonth = moment(currentDate.format('MMMM') + " 1, " + currentDate.format('YYYY'));
-  var endWeek = tempCurr.endOf('week').weekday();
-  var end = tempCurr.format('D');
+    var getEnd = moment(currentDate);
+    var week = Math.ceil(getEnd.endOf('week').date()/7);
 
-  var week = Math.ceil(currentDate.endOf('week').date()/7);
-  var start = currentDate.startOf('week').format('D');
+    var start = null;
+    var end = null;
+    var m = currentDate.format('MMMM');
 
-  var diff = parseInt(end)-parseInt(start);
-  var dayNums = [];
-  var m = currentDate.format('MMMM');
-  if(diff===6){
-    for(var i=parseInt(start); i<=parseInt(end); i++){
-      dayNums.push(i);
+    var dTemp = currentDate.weekday();
+    var testing = [];
+    var testingDates = [];
+    var date = moment(currentDate);
+
+    var tempMth = currentDate.month();
+    var tempDay = date.subtract(dTemp, 'days');
+    if(tempDay.month()===tempMth){
+      testing.push(tempDay.date());
+      testingDates.push(tempDay.format('YYYY-MM-DD'));
     }
-  }
-  else{
-    if(parseInt(start)>parseInt(end)){
-      start = firstMonth.format('D');
+    else{
+      testing.push(" ");
+      testingDates.push(" ");
     }
-    for(var i=parseInt(start); i<=parseInt(end); i++){
-      dayNums.push(i);
-    }
-    for(var i=0; i<firstMonth.weekday(); i++){
-      dayNums.unshift(" ");
-    }
-    if(dayNums.length < 7){
-      for(var i=dayNums.length; i<7; i++){
-        dayNums.push(" ");
+    for(var i=1; i<7; i++){
+      var temp = date.add(1, 'days');
+      if(temp.month()===tempMth){
+        testing.push(tempDay.date());
+        testingDates.push(tempDay.format('YYYY-MM-DD'));
+      }
+      else{
+        testing.push(" ");
+        testingDates.push(" ");
       }
     }
-  }
 
-  m += " " + start + "-" + end + " ";
-  res.render('calendar/weekly'
-  ,{
-    fullDate: currentDate.format('MMMM D, YYYY'),
-    monthHeader: currentDate.format('MMMM YYYY'),
-    currentDay: currentDate,
-    weekNum: week,
-    weekNumHeader: week + ": " + m + currentDate.format('YYYY'),
-    dates: dayNums
+    for(var i=0; i<testing.length; i++){
+      if(!isNaN(parseInt(testing[i]))){
+        start = testing[i];
+        break;
+      }
+    }
+    for(var i=testing.length-1; i>=0; i--){
+      if(!isNaN(parseInt(testing[i]))){
+        end = testing[i];
+        break;
+      }
+    }
+
+    m += " " + start + "-" + end + " ";
+
+    res.render('calendar/weekly'
+    ,{
+      fullDate: currentDate.format('MMMM D, YYYY'),
+      monthHeader: currentDate.format('MMMM YYYY'),
+      currentDay: currentDate,
+      weekNum: week,
+      weekNumHeader: week + ": " + m + currentDate.format('YYYY'),
+      dates: testing,
+      shortDates: testingDates,
+      linkMonth: "http://localhost:3000/calendar?date=" + moment(req.query.date).format('YYYY-MM-DD'),
+      linktologout: "http://localhost:3000/logout"
+    }
+    );
   }
-  );
+  else{
+    res.redirect('/');
+  }
 })
 
 module.exports = router;

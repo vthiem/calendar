@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register</title>
+    <link rel='stylesheet' href='/stylesheets/userstyle.css' />
+  </head>
+  <body>
+    <h1>Register</h1>
+    <p id="msg"><%=msg%></p>
+    <p>Please fill out the following fields:</p>
+    <form method="post">
+      <p><label>Username: <input type="text" name="user" value=<%=username%>></label></p>
+      <p><label>Password: <input type="password" name="pass" value=<%=password%>></label></p>
+      <p id="passRepeat">Please retype chosen password (must match above field)</p>
+      <p><label>Password: <input type="password" name="pass2" value=<%=password2%>></label></p>
+      <p><input type="submit" class="links"> <button formaction="/" class="links">Cancel</button></p>
+    </form>
+  </body>
+</html>

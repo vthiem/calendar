@@ -91,9 +91,9 @@ function repWeeklyOptions(){
 }
 
 function sortEvents(eventList, newEvent){
-  var index = null;
+  var index = eventList.length;
   for(var i=0; i<eventList.length; i++){
-    if(eventList[i].startDate > newEvent.startDate){ //FIX BY START TIME
+    if(eventList[i].sTime > newEvent.sTime){
       index = i;
       break;
     }
@@ -112,7 +112,7 @@ function addToDateEvents(eDate, eName, eStartDate, eEndDate, eDetails, eRepeatDu
   }
 }
 
-function postEvent(eStartDate, eName, eventStartDate, eventEndDate, eDetails, eRepeatDuration, eRepeatDays, sTime, eTime){
+function postEvent(eStartDate, eEndDate, eName, eventStartDate, eventEndDate, eDetails, eRepeatDuration, eRepeatDays, sTime, eTime){
   var eID = "";
   $.post(
     'http://localhost:3000/events',//"http://thiman.me:1337/vanessa",
@@ -125,40 +125,90 @@ function postEvent(eStartDate, eName, eventStartDate, eventEndDate, eDetails, eR
       eventRepeatDays: eRepeatDays
     },
     function(data){
-      var eInfo = $.parseJSON(data);
-      if(eInfo.error===null){
-        eID = eInfo.data._id;
-        addToDateEvents(eStartDate, eName, eventStartDate, eventEndDate, eDetails, eRepeatDuration, eRepeatDays, eID, sTime, eTime);
+      var temp = $.parseJSON(data);
+      if(temp.error===null){
+        var eventAdd = temp.data;
+        var eName = eventAdd.eventName;
+        var eStartDate = eventAdd.eventStart;
+        var eEndDate = eventAdd.eventEnd;
+        var eDate = eStartDate.split('T')[0];
+        var eDetails = eventAdd.eventDesc;
+        var eRepeatDuration = eventAdd.eventRepeat;
+        var eRepeatDays = [eventAdd["eventRepeatDays[0]"], eventAdd["eventRepeatDays[1]"], eventAdd["eventRepeatDays[2]"], eventAdd["eventRepeatDays[3]"], eventAdd["eventRepeatDays[4]"], eventAdd["eventRepeatDays[5]"], eventAdd["eventRepeatDays[6]"]];
+        eID = eventAdd._id;
+        var sTime = eStartDate.split('T')[1].split('.')[0].substring(5,0);
+        var eTime = eEndDate.split('T')[1].split('.')[0].substring(5,0);
+        addToDateEvents(eDate, eName, eStartDate, eEndDate, eDetails, eRepeatDuration, eRepeatDays, eID, sTime, eTime);
+        cancelEdit();
+        if(document.getElementById("rightdrawer").style.zIndex === "3"){
+          setupCalendar(tempYearNum, tempMonthNum);
+          document.getElementById("addEvent").style.marginRight = "0px";
+          document.getElementById("rightdrawer").style.width = "0px";
+          document.getElementById("rightdrawer").style.zIndex="-1";
+        }
         setupCalendar(tempYearNum, tempMonthNum);
       }
       else{
-        alert("POST ERROR: " + eInfo.error);
+        alert(temp.error + " Please review the event edit information.");
       }
     },
     'text'
   );
+  if(checkDate(eStartDate)){
+    var found = false;
+    for(var i=0; i<dateEvents[eStartDate].length; i++){
+      var e = dateEvents[eStartDate][i];
+      if(e.name === eName && e.sTime === sTime && e.eTime === eTime && e.details === eDetails){
+        found = true;
+      }
+    }
+    if(!found){
+      var inputs = [eName, eStartDate, sTime, eEndDate, eTime, eDetails];
+      return updFromForm(inputs);
+    }
+  }
   return eID;
 }
 
+function updFromForm(inputs){
+  var formObj = document.forms['eventInputs'];
+  formObj.elements["eventName"].value = inputs[0];
+  formObj.elements["eventStartDate"].value = inputs[1];
+  formObj.elements["eventStartTime"].value = inputs[2];
+  formObj.elements["eventEndDate"].value = inputs[3];
+  formObj.elements["eventEndTime"].value = inputs[4];
+  formObj.elements["eventDetails"].value = inputs[5];
+  editpopup();
+}
+
 function formHandling(){
-  var formData = new FormData(document.querySelector("#eventInputs"));
-  cancelEdit();
-  var eName = formData.get("eventName");
+    var formData = new FormData(document.querySelector("#eventInputs"));
+    cancelEdit();
+    var eName = formData.get("eventName");
 
-  var eStartDate = formData.get("eventStartDate");
-  var eStartTime = formData.get("eventStartTime");
-  var eventStartDate = new Date(eStartDate.toString() + "T" + eStartTime.toString());
+    var eStartDate = formData.get("eventStartDate");
+    var eStartTime = formData.get("eventStartTime");
+    var eventStartDate = new Date(eStartDate.toString() + "T" + eStartTime.toString());
 
-  var eEndDate = formData.get("eventEndDate");
-  var eEndTime = formData.get("eventEndTime");
-  var eventEndDate = new Date(eEndDate.toString() + "T" + eEndTime.toString());
-  var eDetails = formData.get("eventDetails");
-  var eRepeatDuration = formData.get("repeat");
-  var eRepeatDays = [formData.get("weeklySun"), formData.get("weeklyMon"), formData.get("weeklyTue"), formData.get("weeklyWed"), formData.get("weeklyThu"), formData.get("weeklyFri"), formData.get("weeklySat")];
-
-  if(eStartDate === eEndDate){
-    postEvent(eStartDate, eName, eventStartDate, eventEndDate, eDetails, eRepeatDuration, eRepeatDays, eStartTime, eEndTime);
-  }
+    var eEndDate = formData.get("eventEndDate");
+    var eEndTime = formData.get("eventEndTime");
+    var eventEndDate = new Date(eEndDate.toString() + "T" + eEndTime.toString());
+    var eDetails = formData.get("eventDetails");
+    var eRepeatDuration = formData.get("repeat");
+    var eRepeatDays = [formData.get("weeklySun"), formData.get("weeklyMon"), formData.get("weeklyTue"), formData.get("weeklyWed"), formData.get("weeklyThu"), formData.get("weeklyFri"), formData.get("weeklySat")];
+    var repoptions = new Array();
+    for(var i=0; i<eRepeatDays.length; i++){
+      var r = eRepeatDays[i];
+      if(r === null){
+        repoptions.push(" ");
+      }
+      else{
+        repoptions.push(eRepeatDays[i]);
+      }
+    }
+    if(eStartDate === eEndDate){
+      postEvent(eStartDate, eEndDate, eName, eventStartDate, eventEndDate, eDetails, eRepeatDuration, repoptions, eStartTime, eEndTime);
+    }
   // else{
   //   var s = new Date(eStartDate);
   //   var e = new Date(eEndDate);
@@ -176,29 +226,6 @@ function formHandling(){
   //   }
 
   // }
-  // $.post(
-  //   'http://localhost:3000/events',//"http://thiman.me:1337/vanessa",
-  //   {
-  //     eventName: eName,
-  //     eventStart: eventStartDate,
-  //     eventEnd: eventEndDate,
-  //     eventDesc: eDetails,
-  //     eventRepeat: eRepeatDuration,
-  //     eventRepeatDays: eRepeatDays
-  //   },
-  //   function(data){
-  //     var eInfo = $.parseJSON(data);
-  //     if(eInfo.temp === null){
-  //       var eID = eInfo.data._id;
-  //       addToDateEvents(eStartDate, eName, eventStartDate, eventEndDate, eDetails, eRepeatDuration, eRepeatDays, eID);
-  //       setupCalendar(tempYearNum, tempMonthNum);
-  //     }
-  //     else{
-  //       alert("POST ERROR: " + eInfo.temp);
-  //     }
-  //   },
-  //   'text'
-  // );
 }
 
 function editpopup(){
@@ -230,35 +257,25 @@ function cancelEdit(){
   document.querySelector("#eventInputs").reset();
 }
 
-function getNextMonth(){
-  if(tempMonthNum === 11){
-    tempYearNum += 1;
-    tempMonthNum = 0;
-  }
-  else{
-    tempMonthNum += 1;
-  }
-  setupCalendar(tempYearNum, tempMonthNum);
-}
-
-function getPrevMonth(){
-  if(tempMonthNum == 0){
-    tempYearNum -= 1;
-    tempMonthNum = 11;
-  }
-  else{
-    tempMonthNum -= 1;
-  }
-  setupCalendar(tempYearNum, tempMonthNum);
-}
-
 function createCellDateString(yr, mth, day){
+  var date = yr.toString();
   if(day.toString().length ===1){
-    return yr.toString() + "-" + (mth+1).toString() + "-0" + day.toString();
+    if(mth.toString().length === 1){
+      date += "-0" + (mth+1).toString() + "-0" + day.toString();
+    }
+    else{
+      date += "-" + (mth+1).toString() + "-0" + day.toString();
+    }
   }
   else{
-    return yr.toString() + "-" + (mth+1).toString() + "-" + day.toString();
+    if(mth.toString().length === 1){
+      date += "-0" + (mth+1).toString() + "-" + day.toString();
+    }
+    else{
+      date += "-" + (mth+1).toString() + "-" + day.toString();
+    }
   }
+  return date;
 }
 
 function setupCalendar(yr, mth){
@@ -320,33 +337,17 @@ function setupCalendar(yr, mth){
   }
 }
 
-function weekViewToMonthView(){
-  document.getElementById("monthlyview").style.display = "inline";
-  document.getElementById("weeklyPanel").style.display = "inline";
-  document.getElementById("weeklyview").style.display = "none";
-  document.getElementById("monthViewButton").style.display = "none";
-  var timeTable = document.querySelector("#weekTimeClick");
-  for(var r=2; r<timeTable.rows.length; r++){
-    for(var c=1; c<timeTable.rows[r].cells.length; c++){
-      if(r===2){
-        timeTable.rows[r].cells[c].style.backgroundColor = "#90a9d4";
-      }
-      else{
-        timeTable.rows[r].cells[c].style.backgroundColor = "white";
-        timeTable.rows[r].cells[c].style.cursor = "auto";
-        timeTable.rows[r].cells[c].innerHTML = " ";
-        if(timeTable.rows[r].cells[c].hasAttribute("onclick")){
-          timeTable.rows[r].cells[c].removeAttribute("onclick");
-        }
-      }
-    }
-  }
-}
-
 function cancelEventDetails(){
   var popup = document.querySelector("#eventdetailspopup");
   popup.style.display = "none";
   popup.style.zIndex = 0;
+  document.querySelector("#detailsName").innerHTML = "";
+  document.querySelector("#detailsSDate").innerHTML = "";
+  document.querySelector("#detailsSSTime").innerHTML = "";
+  document.querySelector("#detailsEDate").innerHTML = "";
+  document.querySelector("#detailsEETime").innerHTML = "";
+  document.querySelector("#detailsDetails").innerHTML = "";
+  document.querySelector("#detailsRepeat").innerHTML = "";
 }
 
 function eventDetails(cell){
@@ -370,139 +371,11 @@ function eventDetails(cell){
   document.querySelector("#detailsRepeat").innerHTML = eFound.repeat;
 }
 
-function hoursBetween(t1, t2){
-  var h1 = t1.split(':');
-  var h2 = t2.split(':');
-  return parseInt(h2[0])-parseInt(h1[0]);
-}
-
-function getWeekView(cell){
-  var rowNum = cell.rowIndex+2;
-  var weekHeading = cell.cells[0].innerHTML;
-  var dayArray = new Array();
-  var firstDate = "";
-  var first = false;
-  var lastDate = "";
-  var last = false;
-  var spaceCount = 0;
-  var temptbl = document.getElementById("monthDayClick");
-  for(var i=0; i<temptbl.rows[rowNum].cells.length; i++){
-    dayArray.push(temptbl.rows[rowNum].cells[i]);
-    if(first===false){
-      if(!isNaN(parseInt(temptbl.rows[rowNum].cells[i].innerHTML))){
-        first = true;
-        firstDate = temptbl.rows[rowNum].cells[i];
-      }
-      else{
-        spaceCount += 1;
-      }
-    }
-  }
-  if(spaceCount === 7){
-    return;
-  }
-  for(var i=temptbl.rows[rowNum].cells.length-1; i>=0; i--){
-    if(last===false){
-      if(!isNaN(parseInt(temptbl.rows[rowNum].cells[i].innerHTML))){
-        last = true;
-        lastDate = temptbl.rows[rowNum].cells[i];
-      }
-    }
-  }
-
-  var rowOfDates = document.querySelector("#weeklydates");
-  var timeTable = document.querySelector("#weekTimeClick");
-  for(var i=1; i<rowOfDates.cells.length; i++){
-    rowOfDates.cells[i].innerHTML = dayArray[i-1].innerHTML;
-    var dDate = dayArray[i-1].getAttribute("data-date");
-    if(checkDate(dDate)){
-      rowOfDates.cells[i].style.backgroundColor = "gray";
-      for(var e=0; e<dateEvents[dDate].length; e++){
-        var eventTemp = dateEvents[dDate][e];
-        var start = eventTemp.sTime.substring(0,2) + ":00";
-        var end = eventTemp.eTime.substring(0,2) + ":00";
-        var eventStart = false;
-        var startCell = null;
-        var eventEnd = false;
-        var hours = hoursBetween(eventTemp.sTime, eventTemp.eTime);
-        var hoursCounted = 0;
-        for(var t=3; t<timeTable.rows.length; t++){
-          var dataTime = timeTable.rows[t].cells[i].getAttribute("data-time");
-          timeTable.rows[t].cells[i].style.color = "gray";
-          timeTable.rows[t].cells[i].style.fontSize = "14px";
-          timeTable.rows[t].cells[i].style.textAlign = "center";
-          timeTable.rows[t].cells[i].setAttribute("data-id", eventTemp.id);
-          if(!eventStart && start===dataTime){
-            timeTable.rows[t].cells[i].style.backgroundColor = "#AAD5E3";
-            var pStart = document.createElement("p");
-            pStart.innerHTML = eventTemp.sTime;
-            timeTable.rows[t].cells[i].appendChild(pStart);
-            if(hours <= 1){
-              var pName = document.createElement("p");
-              pName.innerHTML = eventTemp.name;
-              timeTable.rows[t].cells[i].appendChild(pName);
-              var pEnd = document.createElement("p");
-              pEnd.innerHTML = eventTemp.eTime;
-              timeTable.rows[t].cells[i].appendChild(pEnd);
-            }
-            else if(hours === 2){
-              var pName = document.createElement("p");
-              pName.innerHTML = eventTemp.name;
-              timeTable.rows[t].cells[i].appendChild(pName);
-            }
-            else{
-              hoursCounted += 2;
-            }
-            timeTable.rows[t].cells[i].setAttribute("onclick", "eventDetails(this)");
-            timeTable.rows[t].cells[i].style.cursor = "pointer";
-            eventStart = true;
-            startCell = timeTable.rows[t].cells[i];
-          }
-          else if(eventStart && !eventEnd){
-            if(end===dataTime){
-              eventEnd = true;
-              break;
-            }
-            if(hours===2){
-              var pEnd = document.createElement("p");
-              pEnd.innerHTML = eventTemp.eTime;
-              timeTable.rows[t].cells[i].appendChild(pEnd);
-            }
-            else if(hoursCounted===2){
-              var pName = document.createElement("p");
-              pName.innerHTML = eventTemp.name;
-              timeTable.rows[t].cells[i].appendChild(pName);
-            }
-            else if(hoursCounted === hours){
-              var pEnd = document.createElement("p");
-              pEnd.innerHTML = eventTemp.eTime;
-              timeTable.rows[t].cells[i].appendChild(pEnd);
-            }
-            hoursCounted += 1;
-            timeTable.rows[t].cells[i].style.backgroundColor = "#AAD5E3";
-            timeTable.rows[t].cells[i].setAttribute("onclick", "null");
-            timeTable.rows[t].cells[i].style.cursor = "pointer";
-            timeTable.rows[t].cells[i].onclick = function(){
-              eventDetails(startCell);
-            };
-          }
-        }
-      }
-    }
-  }
-
-  document.getElementById("monthlyview").style.display = "none";
-  document.getElementById("weeklyPanel").style.display = "none";
-  document.getElementById("weeklyview").style.display = "inline";
-  document.getElementById("monthViewButton").style.display = "inline";
-  document.querySelector(".weekview th").innerHTML = weekHeading + ": " + months[tempMonthNum] + " " + firstDate.innerHTML + "-" + lastDate.innerHTML + " " + tempYearNum;
-}
-
 function deleteEvent(event){
   if(confirm("Do you want to delete the following event? \n\n     " + event.getAttribute("data-name"))){
     var dDate = event.getAttribute("data-date");
-    // var dTime = event.getAttribute("data-time");
-    // var dName = event.getAttribute("data-name");
+    var dTime = event.getAttribute("data-time");
+    var dName = event.getAttribute("data-name");
     var dID = event.getAttribute("data-id");
     var tempArray = new Array();
     for(var i=0; i<dateEvents[dDate].length; i++){
@@ -539,7 +412,130 @@ function deleteEvent(event){
   }
 }
 
+function updateHandling(){
+  var id = document.querySelector("#updateevent").getAttribute("data-id");
+  var formData = new FormData(document.querySelector("#updateInputs"));
+  var eName = formData.get("eventName");
+
+  var eStartDate = formData.get("eventStartDate");
+  var eStartTime = formData.get("eventStartTime");
+  var eventStartDate = new Date(eStartDate.toString() + "T" + eStartTime.toString());
+
+  var eEndDate = formData.get("eventEndDate");
+  var eEndTime = formData.get("eventEndTime");
+  var eventEndDate = new Date(eEndDate.toString() + "T" + eEndTime.toString());
+  var eDetails = formData.get("eventDetails");
+  var eRepeatDuration = formData.get("repeat");
+  var eRepeatDays = [formData.get("weeklySun"), formData.get("weeklyMon"), formData.get("weeklyTue"), formData.get("weeklyWed"), formData.get("weeklyThu"), formData.get("weeklyFri"), formData.get("weeklySat")];
+  var repoptions = new Array();
+  for(var i=0; i<eRepeatDays.length; i++){
+    var r = eRepeatDays[i];
+    if(r === null){
+      repoptions.push(" ");
+    }
+    else{
+      repoptions.push(eRepeatDays[i]);
+    }
+  }
+  cancelUpdate();
+  //PATCH REQUEST & UPDATE DATA STRUCTURE VALUES
+  $.ajax({
+    url: 'http://localhost:3000/events/' + id,//'http://thiman.me:1337/vanessa/',
+    type: 'PATCH',
+    data: {
+      eventName: eName,
+      //NEED TO FIX W DATE
+      // eventStart: eventStartDate,
+      // eventEnd: eventEndDate,
+      eventDesc: eDetails,
+      eventRepeat: eRepeatDuration,
+      eventRepeatDays: repoptions
+    },
+    // contentType: 'application/json',
+    dataType: 'text',
+    success: function(data){
+      var temp = $.parseJSON(data);
+        var eventAdd = temp.data;
+
+        var eName = eventAdd.eventName;
+        var eStartDate = eventAdd.eventStart;
+        var eEndDate = eventAdd.eventEnd;
+        var eDate = eStartDate.split('T')[0];
+        var eDetails = eventAdd.eventDesc;
+        var eRepeatDuration = eventAdd.eventRepeat;
+        var eRepeatDays = [eventAdd["eventRepeatDays[0]"], eventAdd["eventRepeatDays[1]"], eventAdd["eventRepeatDays[2]"], eventAdd["eventRepeatDays[3]"], eventAdd["eventRepeatDays[4]"], eventAdd["eventRepeatDays[5]"], eventAdd["eventRepeatDays[6]"]];
+        var eID = eventAdd._id;
+        var sTime = eStartDate.split('T')[1].split('.')[0].substring(5,0);
+        var eTime = eEndDate.split('T')[1].split('.')[0].substring(5,0);
+        var dDate = eStartDate.split('T')[0];
+
+        var tempArray = new Array();
+        for(var i=0; i<dateEvents[dDate].length; i++){
+          if(eID !== dateEvents[dDate][i].id){
+            tempArray.push(dateEvents[dDate][i]);
+          }
+        }
+        dateEvents[dDate] = tempArray;
+
+      addToDateEvents(eDate, eName, eStartDate, eEndDate, eDetails, eRepeatDuration, eRepeatDays, eID, sTime, eTime);
+      SlideEventPanel(clickedPanelCell);
+      setupCalendar(currentYearNum, currentMonthNum);
+      alert("Event " + eName + " on " + dDate + " has been updated.");
+    },
+    error: function(XMLHttpRequest, textStatus, error){
+      alert(" Status: " + textStatus + " ErrorType: " + error);
+    }
+  });
+}
+
+function cancelUpdate(){
+  var form = document.querySelector("#updateevent");
+  if(document.getElementById("rightdrawer").style.zIndex === "3"){
+    document.getElementById("rightdrawer").style.filter = "blur(0px)";
+  }
+  document.getElementById("weeklyPanel").style.filter = "blur(0px)";
+  document.getElementById("monthlyview").style.filter = "blur(0px)";
+  document.querySelector("#addEvent").style.display = "inline";
+  form.style.display = "none";
+  form.style.zIndex = "0";
+  document.querySelector("#updateInputs").reset();
+}
+
+function updEvent(input){
+  var id = input.getAttribute("data-id");
+  var date = input.getAttribute("data-date");
+  document.querySelector("#updateevent").style.display = "inline";
+  document.querySelector("#updateevent").style.zIndex = "5";
+  if(document.getElementById("rightdrawer").style.zIndex === "3"){
+    document.getElementById("rightdrawer").style.filter = "blur(1px)";
+  }
+  document.getElementById("weeklyPanel").style.filter = "blur(1px)";
+  document.getElementById("monthlyview").style.filter = "blur(1px)";
+  document.querySelector("#addEvent").style.display = "none";
+  var e = null;
+  var found = false;
+  for(var i=0; i<dateEvents[date].length; i++){
+    if(dateEvents[date][i].id === id){
+      e = dateEvents[date][i];
+      found = true;
+      break;
+    }
+  }
+  if(found){
+    var formObj = document.forms['updateInputs'];
+    formObj.elements["eventName"].value = e.name;
+    formObj.elements["eventStartDate"].value = e.startDate.split('T')[0];
+    formObj.elements["eventStartTime"].value = e.sTime;
+    formObj.elements["eventEndDate"].value = e.endDate.split('T')[0];
+    formObj.elements["eventEndTime"].value = e.eTime;
+    formObj.elements["eventDetails"].value = e.details;
+    document.querySelector("#updateevent").setAttribute("data-id", id);
+  }
+}
+
+var clickedPanelCell = null;
 function SlideEventPanel(cell){
+  clickedPanelCell = cell;
   if(!isNaN(parseInt(cell.innerHTML))){
     var dataDate = cell.getAttribute("data-date");
     var eventsOnDate = checkDate(dataDate);
@@ -565,9 +561,6 @@ function SlideEventPanel(cell){
         color = "gray";
         for(var i=0; i<dateEvents[dataDate].length; i++){
           var ddTime = document.createElement("dd");
-          // ddTime.onclick = function(){
-          //   alert("clicked");
-          // };
           ddTime.style.cursor = "pointer";
           var timeText = document.createTextNode(dateEvents[dataDate][i].sTime + " - " + dateEvents[dataDate][i].eTime + "  ");
           ddTime.appendChild(timeText);
@@ -585,6 +578,22 @@ function SlideEventPanel(cell){
           };
           var delText = document.createTextNode("x");
           delButton.appendChild(delText);
+
+          var updButton = document.createElement("button");
+          updButton.style.cursor = "pointer";
+          updButton.classname = "delEvent";
+          updButton.setAttribute("data-name", dateEvents[dataDate][i].name);
+          updButton.setAttribute("data-time", dateEvents[dataDate][i].sTime);
+          updButton.setAttribute("data-date", dataDate);
+          updButton.setAttribute("data-id", dateEvents[dataDate][i].id);
+          updButton.style.marginLeft = "5px";
+          updButton.style.marginTop = "5px";
+          updButton.onclick = function(){
+            updEvent(this);
+          };
+          var updText = document.createTextNode("update");
+          updButton.appendChild(updText);
+
           ddTime.setAttribute("data-name", dateEvents[dataDate][i].name);
           ddTime.setAttribute("data-time", dateEvents[dataDate][i].sTime);
           ddTime.setAttribute("data-id", dateEvents[dataDate][i].id);
@@ -594,11 +603,9 @@ function SlideEventPanel(cell){
           };
           timeText.parentNode.className = "datetime";
           parent.insertBefore(delButton, null);
+          parent.insertBefore(updButton, null);
           parent.insertBefore(ddTime, null);
           var ddName = document.createElement("dd");
-          // ddName.onclick = function(){
-          //   alert("clicked");
-          // }
           ddName.style.cursor = "pointer";
           var nameText = document.createTextNode(dateEvents[dataDate][i].name);
           ddName.appendChild(nameText);
@@ -656,15 +663,6 @@ function loadEvents(){
 var prevCell = null;
 window.onload = function () {
   loadEvents();
- // setupCalendar(currentYearNum, currentMonthNum);
-  var weekPanelTbl = document.getElementById("weeklyPanelClick");
-  if(weekPanelTbl != null){
-    for(var i=0; i<weekPanelTbl.rows.length; i++){
-        weekPanelTbl.rows[i].onclick = function () {
-          getWeekView(this);
-        };
-    }
-  }
 
   var monthDaysTable = document.getElementById("monthDayClick");
   if(monthDaysTable != null){

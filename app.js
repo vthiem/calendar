@@ -4,12 +4,15 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('client-sessions');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var register = require('./routes/register');
 var events = require('./routes/events');
 var calendar = require('./routes/calendar');
 var weeklyview = require('./routes/weeklyview');
+var logout = require('./routes/logout');
 
 var app = express();
 
@@ -40,10 +43,20 @@ app.use(function(req, res, next){
   next();
 })
 
-app.use('/', calendar); //index before
+app.use(session({
+  cookieName: 'session',
+  secret: 'theportalcalendar',
+  duration: 30*60*1000,
+  activeDuration: 5*60*1000
+}));
+
+app.use('/', index); //calendar before
 app.use('/users', users);
+app.use('/register', register);
 app.use('/events', events);
 app.use('/weekly', weeklyview);
+app.use('/calendar', calendar);
+app.use('/logout', logout);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

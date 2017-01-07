@@ -1,0 +1,35 @@
+body {
+  background-color: #90C1D4;
+  font-family: Tahoma;
+  margin-top: 12%;
+}
+
+h1 {
+  font-size: 30px;
+  color: white;
+  text-align: center;
+}
+
+p {
+  color: white;
+  font-size: 20px;
+  text-align: center;
+}
+
+.links {
+  background-color: #90a9d4;
+  color: white;
+  font-size: 20px;
+  width: 100px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+#msg {
+  font-size: 22px;
+  color: gray;
+}
+
+#passRepeat {
+  font-size: 16px;
+}
